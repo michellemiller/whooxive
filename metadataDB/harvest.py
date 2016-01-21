@@ -4,19 +4,32 @@ Created on Mon Jan 18 00:04:42 2016
 
 @author: emarti
 """
-import getmetadata
+import getMetadata
 import addArticle
 import time
 import itertools
 
-def harvest():
+def harvest(fromdate, todate):
     start = time.time()
-    xmlList = getmetadata.download(getmetadata.constructURL())
+    xmlList = getMetadata.retrieve(getMetadata.constructURL(fromdate, todate))
     
-    listArticle = list(itertools.chain.from_iterable([getmetadata.parse(x) for x in xmlList]))
+    print type(xmlList)
+    if xmlList is not None:
+        listArticle = list(itertools.chain.from_iterable([getMetadata.parse(x) for x in xmlList]))
+    
+        numNewArticle = 0
+        for article in listArticle:
+            numNewArticle += addArticle.addArticle(article)
+    
+        final = time.time()
+    
+        try:
+            #        print article
+            print 'Total time: %f for %i entries (%f per entry)' % (final - start, len(listArticle), (final-start)/len(listArticle))
+        except:
+            pass
 
-    for article in listArticle:
-        addArticle.addArticle(article)
-    final = time.time()
-    print 'Total time: %f for %i entries (%f per entry)' % (final - start, len(listArticle), (final-start)/len(listArticle))
-
+        return numNewArticle
+    else:
+        return 0
+    

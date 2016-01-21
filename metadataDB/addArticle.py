@@ -29,14 +29,20 @@ def addArticle(articleDict, update=False):
             updated = parser.parse(articleDict['updated'])
         except:
             updated = None
+        try:
+            oai_datestamp = parser.parse(articleDict['OAI_datestamp'])
+        except:
+            oai_datestamp = None
         
-        new_article = Article(arxiv_id=     articleDict['id'],
-                              created=      created,
-                              updated=      updated,
-                              title=        articleDict['title'],
-                              comments=     articleDict['comments'],
-                              journal_ref=  articleDict['journal_ref'],
-                              doi=          articleDict['doi'],
+        new_article = Article(arxiv_id=      articleDict['id'],
+                              oai_id=        articleDict['OAI_identifier'],
+                              oai_datestamp= oai_datestamp,
+                              created=       created,
+                              updated=       updated,
+                              title=         articleDict['title'],
+                              comments=      articleDict['comments'],
+                              journal_ref=   articleDict['journal_ref'],
+                              doi=           articleDict['doi'],
                               )
         
         new_author_list = []
@@ -88,3 +94,8 @@ def addArticle(articleDict, update=False):
         session.add_all(new_category_list)
         session.add_all(new_article_category_list)
         session.commit()
+        
+        #If we add a new article, add 1
+        return 1
+    else:
+        return 0

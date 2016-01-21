@@ -9,6 +9,8 @@ class Article(Base):
     __tablename__ = 'article'
     id = Column(Integer, primary_key = True)
     arxiv_id = Column(String())
+    oai_id = Column(String())
+    oai_datestamp = Column(Date)
     created = Column(Date)
     updated = Column(Date)
     title = Column(String())
