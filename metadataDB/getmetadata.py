@@ -18,7 +18,7 @@ def resume_retrieve(token):
 def retrieve_one_page(url):
     opener = urllib2.build_opener()    
     #opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    maxTries = 2
+    maxTries = 5
     tryNumber = 0
     gotdata = False
     
@@ -29,7 +29,9 @@ def retrieve_one_page(url):
             response = opener.open(url)
         except urllib2.HTTPError as e:
             print e
-            sleep(30)
+            sleep(25)
+            if tryNumber - 1 == maxTries:
+                sleep(600)
         except urllib2.URLError as e:
             print 'Could not reach server.'
             break
@@ -38,30 +40,27 @@ def retrieve_one_page(url):
             response.close()
             
             # Check if there's a resumption token.
-            e = etree.fromstring(xml)
-            e1 = e.find('.//{http://www.openarchives.org/OAI/2.0/}resumptionToken')
+            e = etree.fromstring(xml).find('.//{http://www.openarchives.org/OAI/2.0/}resumptionToken')
             
-            return (xml, e1)
-    return None
+            return (xml, e)
+    return (None, None)
     # Two main complications: retry after a fixed time and resumption tokens.
     # If the list is too long, it can pass a resumptionToken. This requires
     # waiting and submitting another request a minute (or so) later.
     
 def retrieve(url):
-    out = retrieve_one_page(url)
-    if out is None:
-        return None
-    if out[1] is None:
-        return [out[0]]
-    else:
-        xmlList = [out[0]]
-        e1 = out[1]
-        while e1.text is not None:
-            print 'xml is long... at %s / %s.' % (e1.attrib['cursor'], e1.attrib['completeListSize'])
-            sleep(30)
-            (xml, e1) = retrieve_one_page(resume_retrieve(e1.text))
-            xmlList.append(xml)
-        return xmlList 
+    '''This function is a generator. If the request provides a single page,
+    then it will return a list of length one. If the request provides many
+    pages, the generator will return one additional page each loop.'''
+    (xml, e) = retrieve_one_page(url)
+    if xml is not None:
+        yield xml
+        if e is not None:
+            while e.text is not None:
+                print 'xml is long... at %s / %s.' % (e.attrib['cursor'], e.attrib['completeListSize'])
+                (xml, e) = retrieve_one_page(resume_retrieve(e.text))
+                yield xml
+
 
 def parse(text):
     e = etree.fromstring(text)
@@ -69,11 +68,12 @@ def parse(text):
     stupidPrefix1 = '{http://www.openarchives.org/OAI/2.0/}'
     stupidPrefix2 = '{http://arxiv.org/OAI/arXiv/}'
 
-    for item in e.iterfind('.//' + stupidPrefix1 + 'record'):   
+    for item in e.iterfind('.//' + stupidPrefix1 + 'record'):
         keywords = ['id',
                     'created',
                     'updated',
                     'title',
+                    'abstract',
                     'categories',
                     'comments',
                     'doi',
@@ -108,7 +108,5 @@ def parse(text):
             currentDict['authors'].append(currentAuthor)
 
         currentDict['categories'] = currentDict['categories'].split(' ')
-        
         result.append(currentDict)
-        #break
     return result

@@ -14,6 +14,7 @@ class Article(Base):
     created = Column(Date)
     updated = Column(Date)
     title = Column(String())
+    abstract = Column(String())
     comments = Column(String())
     journal_ref = Column(String())
     doi = Column(String())
@@ -63,7 +64,7 @@ class Article_Category(Base):
     category = relationship(Category)
 
 # Create database
-engine = create_engine("sqlite:///arXiv_metadata.db", echo=False)
+engine = create_engine("sqlite:///../arXiv_metadata.db", echo=False)
 #conn = db.connect()
 Base.metadata.create_all(engine)
 

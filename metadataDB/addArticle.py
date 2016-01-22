@@ -9,7 +9,7 @@ def addArticle(articleDict, update=False):
     
     update=False skips identical arXiv IDs """
     
-    engine = create_engine("sqlite:///arXiv_metadata.db", echo=False)
+    engine = create_engine("sqlite:///../arXiv_metadata.db", echo=False)
     Base.metadata.bind = engine
     DBsession = sessionmaker(bind=engine)
     session = DBsession()
@@ -33,13 +33,14 @@ def addArticle(articleDict, update=False):
             oai_datestamp = parser.parse(articleDict['OAI_datestamp'])
         except:
             oai_datestamp = None
-        
+
         new_article = Article(arxiv_id=      articleDict['id'],
                               oai_id=        articleDict['OAI_identifier'],
                               oai_datestamp= oai_datestamp,
                               created=       created,
                               updated=       updated,
                               title=         articleDict['title'],
+                              abstract=      articleDict['abstract'],
                               comments=      articleDict['comments'],
                               journal_ref=   articleDict['journal_ref'],
                               doi=           articleDict['doi'],
