@@ -90,23 +90,28 @@ def parse(text):
                 currentDict[key.replace('-','_')] = None
                 
         currentDict['authors'] = []
-        for author in item.find('.//' + stupidPrefix2 + 'authors').getchildren():
-            keyname = author.find(stupidPrefix2 + 'keyname').text
-            # This doesn't handle multiple affiliations or forenames correctly!!
-            try:
-                forenames = author.find(stupidPrefix2 + 'forenames').text
-            except:
-                forenames = ''
-            try: 
-                affiliation = author.find(stupidPrefix2 + 'affiliation').text
-            except:
-                affiliation = None
+        try:
+            for author in item.find('.//' + stupidPrefix2 + 'authors').getchildren():
+                keyname = author.find(stupidPrefix2 + 'keyname').text
+                # This doesn't handle multiple affiliations or forenames correctly!!
+                try:
+                    forenames = author.find(stupidPrefix2 + 'forenames').text
+                except:
+                    forenames = ''
+                try: 
+                    affiliation = author.find(stupidPrefix2 + 'affiliation').text
+                except:
+                    affiliation = None
 
-            currentAuthor = {'name': forenames + ' ' + keyname,
-                             'affiliation': affiliation}
+                currentAuthor = {'name': forenames + ' ' + keyname,
+                                 'affiliation': affiliation}
 
-            currentDict['authors'].append(currentAuthor)
-
-        currentDict['categories'] = currentDict['categories'].split(' ')
+                currentDict['authors'].append(currentAuthor)
+        except:
+            pass
+        try:
+            currentDict['categories'] = currentDict['categories'].split(' ')
+        except:
+            currentDict['categories'] = []
         result.append(currentDict)
     return result

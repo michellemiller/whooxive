@@ -1,5 +1,8 @@
 *.pyc
 *.db
+*.json
+*.csv
+aps-dataset-
 .DS_Store
 .ipynb_checkpoints
 old

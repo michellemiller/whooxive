@@ -1,0 +1,18 @@
+APS Research Data Set - Citing Article Pairs
+http://journals.aps.org/datasets
+
+NOTICE: This data set is Copyright (c) 2014 The American Physical Society and may not be used without prior permission, if you have received this from a third-party please contact: data-requests@ridge.aps.org Usage of this data set is subject to the Terms and Conditions listed on the data set web page: http://journals.aps.org/datasets
+
+DESCRIPTION
+Citing article pairs: This data set consists of pairs of APS articles that cite each other for the corpus of Physical Review Letters, Physical Review, and Reviews of Modern Physics from 1893 through 2013. For instance, if article A cites article B, there will be an entry in the data set consisting of the pair of DOIs for A and B. This data set is formatted as a comma-separated values (CSV) file consisting of the DOI pairs, one pair per line.
+
+
+FILES
+Below is the list of files contained in this package with a brief description.
+
+aps-dataset-citations-2013.csv - CSV file containing pairs of citing to cited article DOI's.
+
+
+CONTACT
+Questions or problems regarding this data set may be addressed to:
+data-requests@aps.org
