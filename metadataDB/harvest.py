@@ -4,7 +4,7 @@ Created on Mon Jan 18 00:04:42 2016
 
 @author: emarti
 """
-import getMetadata
+import getmetadata
 import addArticle
 import time
 import itertools
