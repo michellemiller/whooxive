@@ -1,0 +1,9 @@
+Loaded articles. 344.268078 seconds
+
+Breakdown of articles (after duplicates removed):
+quant-ph       52922
+str-el         27240
+hep-           144487
+mtrl-sci       32949
+plasm-ph       5709
+Total          263307

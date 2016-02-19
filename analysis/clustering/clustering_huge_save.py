@@ -48,6 +48,7 @@ session = DBsession()
 abstract_all_tmp = {'category': [], 'abstract': []}
 # category_list = sorted(['atom-ph', 'quant-ph', 'optics', 'nlin', 'str-el', 'stat'])
 category_list = sorted(['quant-ph', 'str-el', 'hep-', 'mtrl-sci', 'plasm-ph'])
+#category_list = ['atom-ph']
 category_len = len(category_list)
 
 start = time.time()
@@ -100,8 +101,7 @@ print '{:<15}{}'.format('Total', len(abstract_all['abstract']))
 x_train, x_test, y_train, y_test = train_test_split(abstract_all['abstract'],
                                                     abstract_all['category'],
                                                     random_state=42,
-                                                    train_size=10000,
-                                                    test_size=10000)
+                                                    train_size=0.9)
 
 counter_train = Counter(y_train)
 
@@ -110,11 +110,11 @@ counter_train = Counter(y_train)
 # Now, try KMeans clustering.
 # See: http://scikit-learn.org/stable/auto_examples/text/document_clustering.html
 
-n_clusters = 10
+n_clusters = 20
 # Reduce n_init to 10 for testing purposes.
 clf_unsupervised = Pipeline([('vect', CountVectorizer(ngram_range=(1,3), stop_words='english')),
                              ('tfidf', TfidfTransformer()),
-                             ('clf', KMeans(n_clusters=n_clusters, n_init=1))])
+                             ('clf', KMeans(n_clusters=n_clusters, n_init=2, n_jobs=-1))])
 start = time.time()
 clf_unsupervised.fit(x_train)
 print 'Trained Kmeans algorithm. %f seconds' % (time.time() - start)
