@@ -1,0 +1,294 @@
+<html>
+<head>
+</head>
+<style>
+
+.bar-left {
+    fill: brown; 
+}
+
+.bar-left:hover {
+  fill: red;
+}
+
+.bar-right{
+    fill: steelblue;
+}
+
+.bar-right:hover {
+  fill: blue;
+}
+
+
+.text {
+    font-family: sans-serif;
+    font-size: 14px;
+    fill: gray;
+}
+
+.text-label {
+    font-family: sans-serif;
+    font-size: 14px;
+    fill: black;
+    text-anchor: middle;
+}
+
+.axis text {
+
+    font: 12px sans-serif;
+
+}
+
+.axis path, .axis line {
+
+    fill: none;
+
+    stroke: #000;
+
+    shape-rendering: crispEdges;
+
+}
+
+</style>
+<div class="chart"></div>
+<body>
+    <form>
+      <label><input type="radio" name="category" value="atom_ph" onclick="update()" checked>
+          Atom-ph</label>  
+      <label><input type="radio" name="category" value="quant_ph" onclick="update()">Quant-ph</label>
+      <!-- <label><input type="radio" name="category" value="quant_gas" onclick="update()">Quant-gas</label> -->
+      <label><input type="radio" name="category" value="cond_mat"  onclick="update()">Cond-mat</label>
+      <!-- <label><input type="radio" name="category" value="hep_th"  onclick="update()">Hep-th</label> -->
+      <label><input type="radio" name="category" value="str_el"  onclick="update()">Str-el</label>
+    </form>
+
+    <form>
+      <label><input type="radio" name="journal" value="PRL/Nature" onclick="update()" checked>
+          PRL/Nature</label> 
+      <label><input type="radio" name="journal" value="APL/Nature" onclick="update()">APL/Nature</label> 
+      <label><input type="radio" name="journal" value="PRL/APL" onclick="update()">PRL/APL</label>
+      <!-- <label><input type="radio" name="journal" value="APL" onclick="update()">APL</label> -->
+      <!-- <label><input type="radio" name="journal" value="AP" onclick="update()">AP*</label>
+      <label><input type="radio" name="journal" value="" onclick="update()">All</label> -->
+    </form>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    
+    var margin = {
+        top: 50,
+        right: 10,
+        bottom: 10,
+        left: 120,
+        text:50,
+        topaxis: 50,
+        leftaxis: 200,
+        toptext: 20,
+        lefttext: 20,
+    },  width = 600 - margin.left - margin.right - 2*margin.text,
+        height = 600 - margin.top - margin.bottom;
+    
+    var transition_time = 1000; // milliseconds
+
+    var x = d3.scale.linear()
+        .range([0, width])
+
+    var y = d3.scale.ordinal()
+        .rangeRoundBands([0, height], .2);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("top");
+        
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+    var g = svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                .call(xAxis);
+
+    svg.append("text")
+        .attr("class", "text-label")
+        .attr("transform", "translate(" + (margin.left + width/2) + "," + margin.toptext + ")")
+        .text("Support vector coefficients");
+                
+    // d3.json("data.json", function(d) {
+    //     var data_all = d;
+    //     plotdata(data_all);
+    // });
+    //d3.json("data.json", plotdata);
+    
+    update()
+    
+    
+    
+    function update() {
+        d3.json("svm_journal.json", plotdata);
+    }
+    
+    // var svg = d3.select("body").append("svg")
+    //     .attr("width", width + margin.left + margin.right)
+    //     .attr("height", height + margin.top + margin.bottom);
+        // .append("g")
+        // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    function plotdata(data_all) {
+        // Which checkbox is selected?
+        
+        var category = d3.select('input[name="category"]:checked').node().value
+        var journal = d3.select('input[name="journal"]:checked').node().value
+        data = data_all[category][journal]
+
+        
+        // Plot the data
+        // var svg = d3.select("body").append("svg")
+        //     .attr("width", width + margin.left + margin.right)
+        //     .attr("height", height + margin.top + margin.bottom)
+        //     .append("g")
+        //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var maxX = d3.max(data.map(function (d) {
+            return Math.abs(d.value);
+        }));
+        
+        x.domain([-1.1*maxX, 1.1*maxX]);
+        // x.domain([0, Math.max(data.map(function (d) {
+        //     return  Math.abs(d.value)
+        // }))])
+        
+        y.domain(data.map(function (d) {
+            return d.name;
+        }));
+
+        var barright = svg.selectAll(".bar-right")
+                          .data(data);
+        barright.exit().remove();
+        barright.enter().append("rect");
+        
+        
+        barright.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .transition().duration(transition_time)
+            .attr("class", "bar-right")
+            .attr("x", function (d) {
+                return x(Math.min(0, d.value));
+            })
+            .attr("y", function (d) {
+                return y(d.name);
+            })
+            .attr("width", function (d) {
+                return Math.abs(Math.max(x(d.value) - x(0), 0));
+            })
+            .attr("height", y.rangeBand());
+        
+        var barleft = svg.selectAll(".bar-left")
+                          .data(data);
+        barleft.exit().remove();
+        barleft.enter().append("rect");
+        
+        barleft.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+                .transition().duration(transition_time)
+                .attr("class", "bar-left")
+                .attr("x", function (d) {
+                return x(Math.min(0, d.value));
+            })
+                .attr("y", function (d) {
+                return y(d.name);
+            })
+                .attr("width", function (d) {
+                // return Math.abs(x(-d.value) - x(0));
+                return Math.abs(Math.max(x(-d.value)- x(0), 0));
+            })
+                .attr("height", y.rangeBand());
+
+        var text = svg.selectAll(".text")
+                      .data(data);
+        text.exit().remove();
+        text.enter().append("text");
+        text.attr("transform", "translate(" + margin.lefttext + "," + margin.top + ")").attr("class", "text")
+            .attr("x", function(d) { return x(-maxX) })
+            // .attr("y", function(d) { return y(d.name)+16 } )
+            .attr("text-anchor", "left")
+            .style("opacity", 0.0)
+            .transition()
+            .duration(transition_time)
+            .attr("y", function(d) { return y(d.name) + y.rangeBand()} )
+            .style("opacity", 1.0)
+            .text( function(d) { return d.name } );
+            
+        // var textright = svg.selectAll(".text.right")
+        //         .append("text");
+        //         .attr("class", "text-label")
+        //         .attr("transform", "translate(" + (margin.left + width/2) + "," + margin.toptext + ")")
+        //         .attr("text-anchor", "left")
+        //         .text("Nature");
+        // textright.exit().remove();
+        // textright.enter().append("text");
+        // textright.attr("class", "text-label")
+        //          .attr("transform", "translate(" + (margin.left + width/2) + "," + margin.toptext + ")")
+        //         .attr("text-anchor", "left")
+        //         .text("Nature");
+                // .style("opacity", 0.0)
+                // .transition()
+                // .duration(transition_time)
+                // .style("opacity", 1.0)
+                
+            
+        xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("top");
+        
+            
+        var g = d3.select(".x.axis")
+                    .attr("class", "x axis")
+                    .transition()
+                    .duration(transition_time)
+                    .call(xAxis);
+                    
+        // var g = svg.append("g")
+        //             .attr("class", "x axis")
+        //             .transition()
+        //             .duration(transition_time)
+        //             .call(xAxis);
+        //
+                    
+        // svg.append("g")
+        //     .attr("class", "x axis")
+        //     .append("line")
+        //     .attr("y1", y(-15))
+        //     .attr("y2", y(-15))
+        //     .attr("x2", width);
+
+    }
+    
+    function type(d) {
+        d.value = +d.value;
+        return d;
+    }
+    
+    // var timeout = setTimeout(function() {
+    //   d3.select("input[value=\"atom_ph\"]").property("checked", true)
+    //     .each(change);
+    // }, 2000);
+    
+    // function change() {
+    //   clearTimeout(timeout);
+    //   if (this.value === "grouped") console.log(1);
+    //   else console.log(2);
+    // }
+    
+    // var svg = d3.select("body").append("svg")
+    // svg.selectAll("circle")
+    //     .data([{"x": 10.0, "y": 10.1}, {"x": 20.0, "y": 20.1}])
+    //   .enter().append("circle")
+    //     .attr("class", "circle-test")
+    //     .attr("cx", function(d) { return d.x; })
+    //     .attr("cy", function(d) { return d.y; })
+    //     .attr("r", 20);
+    
+    
+
+    </script>
+</body>
+

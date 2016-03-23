@@ -1,0 +1,217 @@
+<html>
+<head>
+</head>
+<style>
+
+.bar-left {
+    fill: brown; 
+}
+
+.bar-left:hover {
+  fill: red;
+}
+
+.bar-right{
+    fill: steelblue;
+}
+
+.bar-right:hover {
+  fill: blue;
+}
+
+
+.text {
+    font-family: sans-serif;
+    font-size: 16px;
+    fill: blue;
+}
+
+.axis text {
+
+    font: 10px sans-serif;
+
+}
+
+.axis path, .axis line {
+
+    fill: none;
+
+    stroke: #000;
+
+    shape-rendering: crispEdges;
+
+}
+
+.circle-test {
+    stroke: blue;
+    fill: red;
+}
+
+
+</style>
+<div class="chart"></div>
+<body>
+    <form>
+      <label><input type="radio" name="category" value="atom_ph" onclick="update()" checked>
+          Atom-ph</label>  
+      <label><input type="radio" name="category" value="quant_ph" onclick="update()">Quant-ph</label>
+      <label><input type="radio" name="category" value="cond_mat"  onclick="update()">Cond-mat</label>
+      <label><input type="radio" name="category" value="hep_th"  onclick="update()">Hep-th</label>
+    </form>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript">
+    
+    var margin = {
+        top: 30,
+        right: 10,
+        bottom: 10,
+        left: 10,
+        text:50,
+    },  width = 600 - margin.left - margin.right - 2*margin.text,
+        height = 600 - margin.top - margin.bottom;
+    
+    var transition_time = 5000; // milliseconds
+
+    var x = d3.scale.linear()
+        .range([0, width])
+
+    var y = d3.scale.ordinal()
+        .rangeRoundBands([0, height], .2);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("top");
+
+    // d3.json("data.json", function(d) {
+    //     var data_all = d;
+    //     plotdata(data_all);
+    // });
+    //d3.json("data.json", plotdata);
+    
+    update()
+    
+    
+    
+    function update() {
+        d3.json("data.json", plotdata);
+    }
+    
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        // .append("g")
+        // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    function plotdata(data_all) {
+        // Which checkbox is selected?
+        
+        var category = d3.select('input[name="category"]:checked').node().value
+        data = data_all[category]
+
+        
+        // Plot the data
+        // var svg = d3.select("body").append("svg")
+        //     .attr("width", width + margin.left + margin.right)
+        //     .attr("height", height + margin.top + margin.bottom)
+        //     .append("g")
+        //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        x.domain([-0.03, 0.03]);
+        y.domain(data.map(function (d) {
+            return d.name;
+        }));
+
+        var barright = svg.selectAll(".bar-right")
+                          .data(data);
+        barright.exit().remove();
+        barright.enter().append("rect");
+        
+        barright.transition().duration(transition_time).
+            attr("class", "bar-right")
+            .attr("x", function (d) {
+                return x(Math.min(0, d.value1))+margin.text;
+            })
+            .attr("y", function (d) {
+                return y(d.name);
+            })
+            .attr("width", function (d) {
+                return Math.abs(x(d.value1) - x(0));
+            })
+            .attr("height", y.rangeBand());
+        
+        var barleft = svg.selectAll(".bar-left")
+                          .data(data);
+        barleft.exit().remove();
+        barleft.enter().append("rect");
+        
+        barleft.transition().duration(transition_time).
+            attr("class", "bar-left")
+                .attr("x", function (d) {
+                return x(Math.min(0, -d.value2))-margin.text;
+            })
+                .attr("y", function (d) {
+                return y(d.name);
+            })
+                .attr("width", function (d) {
+                return Math.abs(x(-d.value2) - x(0));
+            })
+                .attr("height", y.rangeBand());
+    
+        var text = svg.selectAll(".text")
+                      .data(data);
+        text.exit().remove();
+        text.enter().append("text");
+        text.attr("class", "text")
+            .attr("x", function(d) { return x(Math.min(0, d.value1)) })
+            // .attr("y", function(d) { return y(d.name)+16 } )
+            .attr("text-anchor", "middle")
+            .style("opacity", 0.0)
+            .transition()
+            .duration(transition_time)
+            .attr("y", function(d) { return y(d.name)+16 } )
+            .style("opacity", 1.0)
+            .text( function(d) { return d.name } );
+
+        var g = svg.append("g")
+                    .attr("class", "x axis")
+                    .call(xAxis);
+
+        // svg.append("g")
+        //     .attr("class", "y axis")
+        //     .append("line")
+        //     .attr("x1", x(0))
+        //     .attr("x2", x(0))
+        //     .attr("y2", height);
+
+    }
+    
+    function type(d) {
+        d.value = +d.value;
+        return d;
+    }
+    
+    // var timeout = setTimeout(function() {
+    //   d3.select("input[value=\"atom_ph\"]").property("checked", true)
+    //     .each(change);
+    // }, 2000);
+    
+    // function change() {
+    //   clearTimeout(timeout);
+    //   if (this.value === "grouped") console.log(1);
+    //   else console.log(2);
+    // }
+    
+    // var svg = d3.select("body").append("svg")
+    // svg.selectAll("circle")
+    //     .data([{"x": 10.0, "y": 10.1}, {"x": 20.0, "y": 20.1}])
+    //   .enter().append("circle")
+    //     .attr("class", "circle-test")
+    //     .attr("cx", function(d) { return d.x; })
+    //     .attr("cy", function(d) { return d.y; })
+    //     .attr("r", 20);
+    
+    
+
+    </script>
+</body>
+
