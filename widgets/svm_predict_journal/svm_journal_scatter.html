@@ -145,32 +145,30 @@
         var x2a = x2.vector1
         var x2b = x2.vector2
         
-        var data2 = {x1a: x1a, x1b: x1b, x2a: x2a, x2b: x2b};
+        var data2 = {x1a: x1a, x2a: x2a};
         // console.log(data2)
         // var y = data.find(function(x) { return x.name === "here we"; }).vector
         // Plot the data
 
         x.domain([0, 1])
         y.domain([0, 1])
-        
+                //
         svg.selectAll(".dot")
             .data(data2)
             .enter().append("circle")
-            .attr("class", "dot")
-            .attr("r", 5)
-            .attr("cx", function(d) { return x(d.x1a) })
-            .attr("cy", function(d) { return y(d.x2a) })
-            .style("fill", "steelblue")
-        
-        
-        svg.selectAll(".dot")
-            .data(data2)
-            .enter().append("circle")
-            .attr("class", "dot")
+            // .attr("class", "dot")
             .attr("r", 50)
-            .attr("cx", 180)
-            .attr("cy", 200)
-            .style("fill", "steelblue")
+            .attr("cx", function(d) { return x(d.x1a); })
+            .attr("cy", function(d) { return y(d.x2a); })
+            .style("fill", "steelblue");
+
+        
+        // svg.append("circle")
+        //     .attr("class", "dot")
+        //     .attr("r", 50)
+        //     .attr("cx", x(x1a))
+        //     .attr("cy", y(x2a))
+        //     .style("fill", "steelblue")
         
         // var maxX = d3.max(data.map(function (d) {
         //     return Math.abs(d.value);
@@ -297,6 +295,8 @@
     
     function type(d) {
         d.value = +d.value;
+        d.vector1 = +d.vector1;
+        d.vector2 = +d.vector2;
         return d;
     }
     
