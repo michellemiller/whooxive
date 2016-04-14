@@ -1,0 +1,3 @@
+[submodule "whooxive-widgets"]
+	path = whooxive-widgets
+	url = git@github.com:emarti/whooxive-widgets.git

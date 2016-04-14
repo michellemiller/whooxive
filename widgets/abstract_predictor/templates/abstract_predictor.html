@@ -1,0 +1,47 @@
+<html>
+<head>
+</head>
+<style type="text/css">
+textarea {
+   font-size: 16pt;
+   font-family: Arial;
+} 
+
+</style>
+<div class="chart"></div>
+<body>
+    <form>
+        Type abstract here:<p>
+        <textarea rows="8" cols="80" id="textarea_abstract" oninput="update()" autofocus></textarea>
+    </form>
+    
+    Journal prediction: <p id="journal"></p>
+    
+    Category predictions: <p id="category"></p>
+    
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type=text/javascript src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script type="text/javascript">
+    var result;
+    function update() {
+        var abstract = document.getElementById("textarea_abstract").value;
+        
+        $.ajax({
+            type: 'POST',
+            url: '/svm',
+            data: {abstract: abstract},
+            success: function(x) { 
+                data = JSON.parse(x);
+                console.log(data);
+                document.getElementById("journal").innerHTML = data.journal;
+                document.getElementById("category").innerHTML = data.category;
+                // document.getElementById("categories").innerHTML = data.categories;
+                result = data; }
+        })
+     
+         // alert("Success! " + abstract);
+    }
+
+    </script>
+</body>
+

@@ -7,4 +7,6 @@
 aps-dataset-
 .DS_Store
 .ipynb_checkpoints
-old
+aps-dataset-*
+*.csv
+*.pkl*
