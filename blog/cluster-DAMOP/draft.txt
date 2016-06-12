@@ -1,0 +1,49 @@
+[Unsupervised learning can find subgroups or ]
+
+
+
+
+When an author submits a paper to the arXiv, (s)he selects a few broad categories such as "physics.atom-ph", meaning atomic physics, the study of atoms and their interactions with light, electrons, materials, and each other (the field of specialty of us). Each category represents an enormous field within physics, represented by [thousands?] of researchers and many conferences.
+
+Clustering, a form of unsupervised learning, identifies groups and similarities between objects in a dataset. For the arXiv dataset, a clustering algorithm can group abstracts by a shared vocabulary, which can be used to identify sub-fields within broader categories.
+
+As we discussed [in a previous article], we represent each article as one point in a very high dimensional vector space. The basis vectors (directions like forward/back, left/right, and up/down in our usual three-dimensional world) are now words, and the length of those vectors are related to how often a word shows up in an abstract. This defines a quantitative measure for "nearness" of papers (a metric) based on how similar the vocabulary is in their abstracts. We use a counting approach called tf-idf [cite] that favors the frequent use of specialized vocabulary.
+
+Our main example is tabulated below, from running the 9000 articles identified in the "physics.atom-ph" through a K-means algorithm set to find 20 clusters. In this case, K-means identifies groups of related words and their frequency (centroids) that best separates the abstracts, where distances 
+ One feature of the K-means algorithm, besides its simplicity and scalability, is that it solves for a centroid, a set of words and phrases similar to abstracts in the same category. 
+
+
+[[[Some kind of table? Filling the text is annoying]]]
+
+As physicists, the results look quite good and seem to represent the field well. For instance, cluster 13 covers attosecond pulses, harmonic generation, and strong-field ionization, the topic of MM's thesis, and cluster 5 identifies the field of Bose-Einstein condensation, the topic of EM's thesis.
+
+As data scientists, how can we verify that these topics are representative besides our own experience? We compare this list to the subfields as specified in the DAMOP (Division of Atomic, Molecular, and Optical Physics) conference. This week-long conference is comprised of a series of invited and [submitted] talks, and organizers of the panel divide those talks into sub-categories.
+
+We check the [quality] of our clustering model against the sessions organized at DAMOP. Since the abstracts to this conference are available, we can use our clustering algorithm to predict which clusters they fall into. Results are below.
+
+[[[Another pop-up table]]]
+
+Remarkably, about 60% of the time, a majority of abstracts in each session are described by a single cluster. 90% of the time, the majority of abstracts fall within two clusters. 
+
+Surprisingly, only few-body sessions does not seem 
+
+What is surprising are the clusters that do not match up with
+
+
+[[[ Finish current analysis: can I see some kind of drop in the trends for these clusters? ]]]
+
+
+We can compare this to 
+
+However, the 
+
+examine abstracts within this broad category and search for sub-fields and trends in the field. 
+
+
+
+[[[OLD]]]
+
+
+In our experience, most DAMOP authors submit to the "physics.atom-ph" and "cond-mat.quant-gas" categories, namely atomic physics and quantum gases (extremely low-temperature samples of atoms or molecules). (Surprisingly, physics.optics is NOT well represented at DAMOP, as this research is presented at conferences that only discuss optics, such as CLEO.) We'll use these two categories as a template for subfields. The number of articles published on the arXiv in these categories increases yearly, and so we expect our clusters to favor more recent advances (more on this below).
+
+Clustering identifies groups of abstracts that 
